@@ -1,0 +1,23 @@
+jupyter lab --ip 0.0.0.0 --port 3002 --no-browser --allow-root
+jupyter lab --ip 0.0.0.0 --port 3002 --no-browser --allow-root & disown
+
+sudo systemctl start jupyter
+sudo systemctl stop jupyter
+sudo systemctl enable jupyter
+
+Reload systemctl
+sudo systemctl daemon-reload
+
+sudo vi /etc/systemd/system/jupyter.service
+Check log
+systemctl status jupyter
+systemctl -l status jupyter
+
+Update service jupyter
+sudo vi /etc/systemd/system/jupyter.service
+
+Update shell run Jupyter
+sudo vi /etc/systemd/system/jupyter-lab.sh
+
+Get Password
+jupyter server list

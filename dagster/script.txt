@@ -1,0 +1,4 @@
+pip install dagster
+dagster project from-example \
+  --name vhm-dagster-project \
+  --example quickstart_etl

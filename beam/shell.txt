@@ -1,0 +1,22 @@
+python -m apache_beam.examples.wordcount --input gs://dataflow-samples/shakespeare/kinglear.txt \
+                                         --output gs://vh_datalake/temp/counts \
+                                         --runner DataflowRunner \
+                                         --project vhm-dataops-prod \
+                                         --region asia-southeast1 \
+                                         --temp_location gs://vh_datalake/temp/temp
+
+python -m apache_beam.examples.wordcount \
+  --output outputs
+
+
+
+pip install apache-beam
+pip install 'apache-beam[gcp]'
+pip install 'apache-beam[aws]'
+pip install 'apache-beam[docs]'
+pip install apache_beam[yaml,gcp]
+
+
+python -m apache_beam.yaml.main --yaml_pipeline_file=/home/hieuhv10/service/beam/project03/readcsv.yaml
+python -m apache_beam.yaml.main --yaml_pipeline_file=/home/hieuhv10/service/beam/project03/readcsv.yaml --runner=apache_beam.runners.render.RenderRunner --render_output=out.png [--render_port=0]
+gcloud beta dataflow yaml run job_name --yaml-pipeline-file=/path/to/pipeline.yaml --region=asia-southeast1	

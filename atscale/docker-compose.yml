@@ -1,0 +1,169 @@
+name: atscale-community-edition
+services:
+  promtail:
+    image: atscaleinc/community-promtail:latest
+    pull_policy: always
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  collector:
+    image: atscaleinc/community-collector:latest
+    pull_policy: always
+
+  tempo:
+    image: atscaleinc/community-tempo:latest
+    pull_policy: always
+    volumes:
+      - atscale-tempo:/storage
+
+  loki:
+    image: atscaleinc/community-loki:latest
+    pull_policy: always
+    volumes:
+      - atscale-loki:/storage
+
+  kong:
+    image: atscaleinc/community-kong:latest
+    pull_policy: always
+    ports:
+      - "80:80"
+      - "11111:11111"
+      - "15432:15432"
+
+  redis:
+    image: redis/redis-stack:7.2.0-v4
+    restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+    volumes:
+      - atscale-cache:/data
+
+  identity:
+    depends_on:
+      postgres:
+        condition: service_healthy
+    image: atscaleinc/community-identity:latest
+    pull_policy: always
+    environment:
+      KEYCLOAK_DATABASE_PASSWORD: "qlg3sze1N7tJRHZVA30r5Iw32Nao"
+      KC_ATSCALE_CLIENT_SECRET: "4YDv3q1iuflYuh2gf9BmwR0OJEIOSUibU2kYUtwoc3SaFAuNOn"
+      KC_ATSCALE_MODELER_CLIENT_SECRET: "gMebUAfgav8SyeqlNCcGJZHobx1QB8f8XQUv6o94Z1DyXd185Q"
+      KC_ATSCALE_API_CLIENT_SECRET: "k102MiAcf1mqGyL5XVd7w9gLvNXLv3c1UmA4kHzCnqtOJZf9C5"
+      KC_ATSCALE_MONITORING_CLIENT_SECRET: "YWaW1rmP0qDMarFBuXW8V7NgxMS0eU4kyf97xwBxIGcJNCQDz2y"
+      KC_ATSCALE_ENTITLEMENT_CLIENT_SECRET: "p6MOU3AN6BezhymUKOK78akQtjC0e2gZTqBtRWFV42B3d12Mnp"
+      KEYCLOAK_ADMIN_PASSWORD: "fazceX7InH28Jp9XxA1Y"
+      KC_ATSCALE_ADMIN_PASSWORD: "5gey3iJ48EtnSnbvNv6usc2QOfrj"
+
+  postgres:
+    image: atscaleinc/community-db:latest
+    pull_policy: always
+    restart: unless-stopped
+    hostname: postgres
+    volumes:
+      - atscale-postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: "qlg3sze1N7tJRHZVA30r5Iw32Nao"
+
+  engine:
+    depends_on:
+      postgres:
+        condition: service_healthy
+      tutorial:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      identity:
+        condition: service_healthy
+      entitlement:
+        condition: service_healthy
+    restart: always
+    image: atscaleinc/community-engine:latest
+    pull_policy: always
+    shm_size: "2gb"
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 65536
+        hard: 65536
+    environment:
+      ATSCALE_ENGINE_KEYCLOAK_CLIENT_SECRET: "4YDv3q1iuflYuh2gf9BmwR0OJEIOSUibU2kYUtwoc3SaFAuNOn"
+      ATSCALE_ENGINE_KEYCLOAK_PASSWORD: "5gey3iJ48EtnSnbvNv6usc2QOfrj"
+      ATSCALE_ENGINE_APP_DB_PASSWORD: "qlg3sze1N7tJRHZVA30r5Iw32Nao"
+      ATSCALE_ENGINE_PGWIRE_METADATA_DB_PASSWORD: "qlg3sze1N7tJRHZVA30r5Iw32Nao"
+
+  web:
+    depends_on:
+      postgres:
+        condition: service_healthy
+      identity:
+        condition: service_healthy
+      tutorial:
+        condition: service_healthy
+    hostname: web
+    image: atscaleinc/community-web:latest
+    pull_policy: always
+    restart: always
+    environment:
+      ATSCALE_SML_KC_CLIENT_SECRET: "gMebUAfgav8SyeqlNCcGJZHobx1QB8f8XQUv6o94Z1DyXd185Q"
+
+  entitlement:
+    depends_on:
+      redis:
+        condition: service_healthy
+      identity:
+        condition: service_healthy
+    sysctls:
+      net.ipv6.conf.all.disable_ipv6: 1
+      net.ipv6.conf.default.disable_ipv6: 1
+    image: atscaleinc/community-entitlement:latest
+    pull_policy: always
+    restart: always
+    environment:
+      ATSCALE_ENTITLEMENT_KC_CLIENT_SECRET: "p6MOU3AN6BezhymUKOK78akQtjC0e2gZTqBtRWFV42B3d12Mnp"
+
+
+  api:
+    depends_on:
+      entitlement:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    image: atscaleinc/community-api:latest
+    pull_policy: always
+    restart: always
+    environment:
+      ATSCALE_API_KC_ADMIN_PASSWORD: "5gey3iJ48EtnSnbvNv6usc2QOfrj"
+      ATSCALE_API_KC_CLIENT_SECRET: "k102MiAcf1mqGyL5XVd7w9gLvNXLv3c1UmA4kHzCnqtOJZf9C5"
+      ATSCALE_API_DB_PASS: "qlg3sze1N7tJRHZVA30r5Iw32Nao"
+
+  tutorial:
+    depends_on:
+      api:
+        condition: service_healthy
+    security_opt:
+      - no-new-privileges:true
+    image: atscaleinc/community-tutorials:latest
+    pull_policy: always
+    restart: unless-stopped
+    volumes:
+      - atscale-tutorial:/var/lib/postgresql/data
+    environment:
+      APPDB_PASSWORD: "qlg3sze1N7tJRHZVA30r5Iw32Nao"
+
+volumes:
+  atscale-postgres:
+    driver: local
+  atscale-identity:
+    driver: local
+  atscale-cache:
+    driver: local
+  atscale-tutorial:
+    driver: local
+  atscale-loki:
+    driver: local
+  atscale-tempo:
+    driver: local

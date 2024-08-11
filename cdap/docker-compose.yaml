@@ -1,0 +1,10 @@
+version: "2.2"
+
+services:
+  cdap-sandbox:
+    container_name: cdap-sandbox
+    image: caskdata/cdap-sandbox:latest
+    ports:
+      - "11011:11011"
+      - "11015:11015"
+    

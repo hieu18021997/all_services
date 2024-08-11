@@ -1,0 +1,17 @@
+gcloud config set project vhm-dataops-prod
+gcloud config set project vhm-dataops-dev
+python3 -m venv ./venv
+./venv/bin/python ./a.py
+
+https://console.cloud.google.com/net-intelligence/topology
+
+conda
+Tạo conda env
+conda create --name myenv --file spec-file.txt
+conda install --name myenv --file spec-file.txt
+
+# Active conda env
+source activate {env_name}
+conda activate base
+conda activate prod
+

@@ -1,0 +1,14 @@
+version: '3.3'
+
+services:
+  hue:
+    image: gethue/hue:latest
+    restart: always
+    ports:
+      - "8898:8888"
+    volumes:
+      - ./hue.ini:/usr/share/hue/desktop/conf/z-hue.ini
+    environment:
+      - REDIS_PASSWORD=vhm@2024
+      - REDIS_PORT=6379
+      - REDIS_DATABASES=16

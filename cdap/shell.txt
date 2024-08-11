@@ -1,0 +1,1 @@
+docker run --name cdap-sandbox -p 11011:11011 -p 11015:11015 caskdata/cdap-sandbox:latest

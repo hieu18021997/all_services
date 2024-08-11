@@ -1,0 +1,36 @@
+dbt --version
+
+python -m pip install --upgrade dbt-ADAPTER_NAME
+python -m pip install --upgrade dbt-core
+python -m pip install --upgrade dbt-core==0.19.0
+python -m pip install --upgrade dbt-bigquery
+
+python -m pip uninstall dbt-postgres
+
+dbt init
+
+dbt --help
+dbt run — Runs the models you defined in your project
+dbt build — Builds and tests your selected resources such as models, seeds, snapshots, and tests
+dbt test — Executes the tests you defined for your project
+dbt compile - generate ra câu lệnh để check số liệu
+
+dbt docs generate --target prod
+dbt docs serve --port 8097
+
+
+python -m pip install dbt-metricflow
+python -m pip install "dbt-metricflow[bigquery]"
+
+mf list metrics
+mf list dimensions --metrics cdp_count
+mf list entities
+mf list dimension-values
+
+parse sematic model
+dbt parse
+
+dbt clean && dbt deps
+
+
+

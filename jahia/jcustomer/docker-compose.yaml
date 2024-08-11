@@ -1,0 +1,23 @@
+version: '3.6'
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.12.1
+    environment:
+      - discovery.type=single-node
+      - cluster.name=contextElasticSearch
+    ports: # Expose Elasticsearch ports
+      - "9200:9200"
+
+  jcustomer:
+    image: jahia/jcustomer:1.6.0
+    container_name: jcustomer
+    environment:
+      - UNOMI_ELASTICSEARCH_ADDRESSES=elasticsearch:9200
+    ports:
+      - 8181:8181
+      - 9443:9443
+      - 8102:8102
+    links:
+      - elasticsearch
+    depends_on:
+      - elasticsearch

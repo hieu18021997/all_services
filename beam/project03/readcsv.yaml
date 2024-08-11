@@ -1,0 +1,9 @@
+pipeline:
+  transforms:
+    - type: ReadFromCsv
+      config:
+        path: /home/hieuhv10/service/beam/project03/data*.csv
+    - type: WriteToJson
+      config:
+        path: /home/hieuhv10/service/beam/project03/output.json
+      input: ReadFromCsv

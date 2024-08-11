@@ -1,0 +1,7 @@
+vnstock==0.2.1
+plotly
+websockets
+discord
+pyTelegramBotAPI
+keras
+tensorflow

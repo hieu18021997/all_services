@@ -1,0 +1,4 @@
+curl https://rill.sh | sh
+select : 3
+
+rill start my-rill-project

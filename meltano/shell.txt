@@ -1,0 +1,34 @@
+docker pull meltano/meltano
+docker run meltano/meltano --version
+
+meltano init vhm-project
+
+meltano add extractor tap-googleads
+meltano config tap-googleads set --interactive
+meltano config tap-googleads test
+meltano config tap-googleads list
+
+meltano add extractor tap-bigquery
+meltano config tap-bigquery set --interactive
+meltano config tap-bigquery test
+meltano config tap-bigquery list
+
+$MELTANO_PROJECT_ROOT/secrets/vhm-etl-data.json
+
+meltano add loader target-bigquery
+meltano config target-bigquery set --interactive
+meltano config target-bigquery list
+
+meltano add extractor tap-csv
+meltano config tap-csv set --interactive
+meltano config tap-csv test
+
+
+TAP_YOUTUBE_ANALYTICS_CHANNEL_IDS='UCYaUqqR-_tiFiz3DgnKzmOA'
+meltano add extractor tap-youtube-analytics
+meltano config tap-youtube-analytics set --interactive
+meltano config tap-youtube-analytics test
+meltano config tap-youtube-analytics list
+
+
+meltano run tap-youtube-analytics target-bigquery
